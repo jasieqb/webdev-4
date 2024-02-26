@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator</title>
+    <script>
+        let historyArr = []
+        let activeWindow = "a"
+        function gen() {
+            const main = document.getElementById("main")
+            const key0 = document.createElement("button")
+            const numbers = Array.from({ length: 10 }, (_, i) => i);
+            const operations = ["+", "-", "*", "/"]
+            const controls = ["C"]
+            operations.forEach((operation) => {
+                const key = document.createElement("button")
+                key.innerText = operation
+                key.onclick = () => handleOperationInput(operation)
+                key.dataset.value = operation
+                if (operation === "+") {
+                    key.style.backgroundColor = "green"
+                } else if (operation === "-") {
+                    key.style.backgroundColor = "red"
+                } else if (operation === "*") {
+                    key.style.backgroundColor = "blue"
+                } else if (operation === "/") {
+                    key.style.backgroundColor = "yellow"
+                }
+                main.appendChild(key)
+            })
+            // new line
+            const br = document.createElement("br")
+            main.appendChild(br)
+            numbers.forEach((number) => {
+                const key = document.createElement("button")
+                key.innerText = number
+                key.onclick = () => handleDigitInput(number)
+                key.dataset.value = number
+                main.appendChild(key)
+                // after 3 numbers, print new line
+                if (number % 3 === 0) {
+                    const br = document.createElement("br")
+                    main.appendChild(br)
+                }
+            })
+            // new line
+            const br2 = document.createElement("br")
+            main.appendChild(br2)
+            controls.forEach((control) => {
+                const key = document.createElement("button")
+                key.innerText = control
+                key.onclick = () => handleControlInput(control)
+                key.dataset.value = control
+                if (control === "C") {
+                    key.style.backgroundColor = "orange"
+                } else if (control === "=") {
+                    key.style.backgroundColor = "purple"
+                }
+                main.appendChild(key)
+            })
+            // new line
+            const br3 = document.createElement("br")
+            main.appendChild(br3)
+
+            // print a and b 
+            const a = document.createElement("input")
+            a.type = "text"
+            a.id = "a"
+            a.placeholder = "a"
+            a.onclick = () => {
+                activeWindow = "a"
+            }
+            // no edit
+            a.readOnly = true
+            main.appendChild(a)
+            const b = document.createElement("input")
+            b.type = "text"
+            b.id = "b"
+            b.placeholder = "b"
+            a.readOnly = true
+            b.onclick = () => {
+                activeWindow = "b"
+            }
+            main.appendChild(b)
+            // new line
+            const br4 = document.createElement("br")
+            main.appendChild(br4)
+            // result
+            const result = document.createElement("input")
+            result.type = "text"
+            result.id = "result"
+            result.placeholder = "result"
+            result.readOnly = true
+            main.appendChild(result)
+
+            // print history
+            const historyDiv = document.createElement("div")
+            historyDiv.id = "history"
+            main.appendChild(historyDiv)
+            historyDiv.innerText = "History"
+            // print history from history array
+            if (Array.isArray(historyArr) && historyArr.length > 0) {
+                historyArr.forEach((h) => {
+                    const p = document.createElement("p")
+                    p.innerText = h
+                    historyDiv.appendChild(p)
+                })
+            }
+
+        }
+        function handleDigitInput(digit) {
+            const a = document.getElementById("a")
+            const b = document.getElementById("b")
+            if (activeWindow === "a") {
+                a.value += digit
+            } else if (activeWindow === "b") {
+                b.value += digit
+            }
+        }
+        function handleOperationInput(operation) {
+            const a = document.getElementById("a")
+            const b = document.getElementById("b")
+            if (a.value !== "" && b.value !== "") {
+                // perform operation
+                if (operation === "/") {
+                    if (b.value === "0") {
+                        alert("Cannot divide by zero")
+                        a.value = ""
+                        b.value = ""
+                        return
+
+                    }
+                }
+                console.log(`${a.value} ${operation} ${b.value}`)
+                const result = eval(`${a.value} ${operation} ${b.value}`)
+                document.getElementById("result").value = result
+                // store history of 
+                // const history = [];
+                // if (Array.isArray(historyArr)) {
+                historyArr.push(`${a.value} ${operation} ${b.value} = ${result}`)
+                let historyDiv = document.getElementById("history")
+                const p = document.createElement("p")
+                p.innerText = `${a.value} ${operation} ${b.value} = ${result}`
+                historyDiv.appendChild(p)
+
+            }
+        }
+
+        function handleControlInput(control) {
+            const a = document.getElementById("a")
+            const b = document.getElementById("b")
+            if (control === "C") {
+                a.value = ""
+                b.value = ""
+            } else if (control === "=") {
+                if (operation === "" || a.value === "" || b.value === "") {
+                    // alert("Please enter a valid operation")
+                    console.log("Please enter a valid operation")
+                    return
+                }
+                // perform operation
+                console.log(`${a.value} ${operation} ${b.value}`)
+                const result = eval(`${a.value} ${operation} ${b.value}`)
+                document.getElementById("result").value = result
+            }
+        }
+
+        function show() {
+            alert(this.dataset.value)
+        }
+    </script>
+</head>
+
+<body onload="gen()">
+    <div id="main">
+    </div>
+</body>
+
+</html>
