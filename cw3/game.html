@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        #main {
+            width: 640px;
+            height: 480px;
+            margin: auto;
+            border: 1px solid black;
+
+        }
+    </style>
+    <script>
+        var canvas
+        var ctx
+        var pos_x = 320, pos_y = 300
+        var welcome_screen = true
+        var enemies = []
+        var bullets = []
+
+        function draw_hero() {
+            ctx.save()
+            ctx.fillStyle = 'rgba(255, 0, 0, 1)';
+            ctx.translate(pos_x, pos_y)
+            ctx.fillRect(0, 0, 10, 30)
+            ctx.restore()
+        }
+
+        function draw_enemies() {
+            for (const element of enemies) {
+                ctx.save()
+                ctx.fillStyle = 'rgba(0, 255, 0, 1)'
+                ctx.translate(element.x, element.y)
+                ctx.fillRect(0, 0, 10, 30)
+                ctx.restore()
+            }
+        }
+
+        function draw_bullets() {
+            for (const element of bullets) {
+                ctx.save()
+                ctx.fillStyle = 'rgba(0, 0, 255, 1)'
+                ctx.translate(element.x, element.y)
+                ctx.fillRect(0, 0, 5, 5)
+                ctx.restore()
+            }
+        }
+
+        function redraw() {
+            ctx.clearRect(0, 0, 640, 480)
+            draw_hero()
+            draw_enemies()
+            draw_bullets()
+        }
+
+        function init() {
+            window.addEventListener("keydown", keyListener, false)
+            canvas = document.getElementById('game')
+            ctx = canvas.getContext('2d')
+            ctx.font = '48px sans-serif'
+            ctx.textAlign = 'center'
+            ctx.fillText('READY PLAYER ONE?', 320, 240)
+            draw_hero()
+        }
+
+        function keyListener(e) {
+            if (welcome_screen) {
+                ctx.clearRect(0, 0, 640, 480)
+                welcome_screen = false
+                window.setInterval(redraw, 10)
+            }
+            switch (e.keyCode) {
+                case 37:
+                    pos_x -= 10
+                    break
+                case 38:
+                    break
+                case 39:
+                    pos_x += 10
+                    break
+                case 40:
+                    break
+            }
+        }
+    </script>
+</head>
+
+<body onload="init()">
+    <div id="main">
+        <canvas id="game" width="640" height="480">
+            Zacznij w końcu używać współczesnej przeglądarki!
+        </canvas>
+    </div>
+</body>
+
+</html>
