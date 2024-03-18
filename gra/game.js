@@ -32,6 +32,23 @@ function keyUpHandler(e) {
     }
 }
 
+// rysowanie spadających obiektów
+
+var osbtacle = {
+    x: 20,
+    y: 20,
+    width: 20,
+    height: 50
+}
+
+function drawObstacle() {
+    ctx.beginPath();
+    ctx.rect(osbtacle.x, osbtacle.y, osbtacle.width, osbtacle.height);
+    ctx.fillStyle = "red"
+    ctx.fill();
+    ctx.closePath();
+}
+
 function drawPlayer() {
     ctx.beginPath();
     ctx.rect(playerX, playerY, playerWidth, playerHeight);
@@ -40,17 +57,65 @@ function drawPlayer() {
     ctx.closePath();
 }
 
+var score = 0;
+
+function detectCollision() {
+    // Check for collision between player and obstacle
+    if (playerX < osbtacle.x + osbtacle.width &&
+        playerX + playerWidth > osbtacle.x &&
+        playerY < osbtacle.y + osbtacle.height &&
+        playerY + playerHeight > osbtacle.y) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+function detectCollisionObsCanvas() {
+    if (osbtacle.y + osbtacle.height > canvas.height) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+function drawScore() {
+    ctx.font = "16px Arial";
+    ctx.fillStyle = "#0095DD";
+    ctx.fillText("Score: " + score, 8, 20);
+}
+
+
 function update() {
-    // Czyszczenie canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     drawPlayer();
+    drawObstacle();
+    drawScore();
 
-    // Aktualizacja pozycji gracza
     if (rightPressed && playerX < canvas.width - playerWidth) {
         playerX += playerSpeed;
     } else if (leftPressed && playerX > 0) {
         playerX -= playerSpeed;
+    }
+    if (detectCollision()) {
+        score++;
+        console.log(score);
+        osbtacle.x = Math.random() * (canvas.width - osbtacle.width);
+        osbtacle.y = -osbtacle.height;
+        if (score > 9) {
+            alert("You win");
+        }
+    }
+    if (detectCollisionObsCanvas()) {
+        alert("You lose");
+    }
+
+    if (osbtacle.y < canvas.height) {
+        osbtacle.y += 2;
+    }
+    if (osbtacle.y === canvas.height) {
+        osbtacle.y = 0;
     }
 
     requestAnimationFrame(update);

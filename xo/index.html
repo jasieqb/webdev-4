@@ -31,7 +31,7 @@
 
             for (let i = 0; i < 9; i++) {
                 const cell = document.createElement("button");
-                cell.addEventListener('click', () => handleCellClick(i));
+                cell.addEventListener('click', (e) => handleCellClick(e, i));
                 board.appendChild(cell);
                 if (i % 3 === 2) {
                     const br = document.createElement("br");
@@ -42,13 +42,15 @@
             main.appendChild(board);
         }
 
-        function handleCellClick(clickedCellIndex) {
+        function handleCellClick(e, clickedCellIndex) {
             if (gameState[clickedCellIndex] !== "" || !gameActive) {
                 return;
             }
 
             gameState[clickedCellIndex] = currentPlayer;
             event.target.innerText = currentPlayer;
+            console.log(e)
+            console.log(event)
             checkForWinner();
         }
 
