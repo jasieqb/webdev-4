@@ -1,0 +1,340 @@
+swagger: "2.0"
+info:
+  version: "0.0.1"
+  title: Node Gallery
+# during dev, should point to your local machine
+host: localhost:10010
+# basePath prefixes all resource paths 
+basePath: /
+# 
+schemes:
+  # tip: remove http to make production-grade
+  - http
+  - https
+# format of bodies a client can send (Content-Type)
+consumes:
+  - application/json
+  - text/html; charset=utf-8
+# format of the responses to the client (Accepts)
+produces:
+  - application/json
+  - text/html; charset=utf-8
+paths:
+  /hello/:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: hello_world
+    get:
+      description: Returns 'Hello' to the caller
+      # used as the method name of the controller
+      operationId: hello
+      parameters:
+        - name: name
+          in: query
+          description: The name of the person to whom to say hello
+          required: false
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/HelloWorldResponse"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  # /:
+  #   x-swagger-router-controller: homepage
+  #   get:
+  #     operationId: homepage
+  #     produces:
+  #       - text/html; charset=utf-8
+  #     responses:
+  #       200:
+  #         description: Success
+  #         schema:
+  #           type: string
+  /image:
+    x-swagger-router-controller: image
+    get:
+      operationId: listImages
+      description: Get list of all images.
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/ImageListResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    post:
+      operationId: createImage
+      description: Add image to list with upload
+      consumes:
+        - multipart/form-data
+      parameters:
+        - name: title
+          description: Image title.
+          type: string
+          in: formData
+        - name: description
+          description: Image description.
+          type: string
+          in: formData
+        - name: upfile
+          description: The file to upload.
+          in: formData
+          type: file
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/ImageResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /image/{id}:
+    x-swagger-router-controller: image
+    get:
+      operationId: readImage
+      description: Get image with selected id
+      parameters:
+        - name: id
+          type: string
+          in: path
+          required: true
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/ImageResponse"
+        default:
+          description: Error
+          schema:
+           $ref: "#/definitions/ErrorResponse"
+    put:
+      operationId: updateImage
+      description: Update image with selected id.
+      consumes:
+        - application/json
+      parameters:
+        - name: id
+          type: string
+          in: path
+          required: true
+        - name: image
+          description: Image properties.
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/ImageUpdate"
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/ImageResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    delete:
+      operationId: deleteImage
+      description: Delete image with selected id.
+      consumes:
+        - application/json
+      parameters:
+        - name: id
+          type: string
+          in: path
+          required: true
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/OperationStatus"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /swagger:
+    x-swagger-pipe: swagger_raw
+# complex objects have schema definitions
+definitions:
+  HelloWorldResponse:
+    required:
+      - message
+    properties:
+      message:
+        type: string
+  User:
+    required:
+      - id
+      - first_name
+      - last_name
+      - login
+      - password
+      - mail
+    properties:
+      id:
+        type: integer
+      first_name:
+        type: string
+      last_name:
+        type: string
+      login:
+        type: string
+      password:
+        type: string
+        format: password
+      mail:
+        type: string
+        format: email
+  Admin:
+    allOf:    
+      - $ref: '#/definitions/User'
+    required:
+      - rights
+    properties:
+      rights:
+        type: string
+  Session:
+    required:
+      - id
+      - token
+      - experience_date
+    properties:
+      id:
+        type: integer
+      token:
+        type: string
+      experience_date:
+        type: string
+        format: date-time
+  Gallery:
+    required:
+      - id
+      - title
+      - description
+      - visibility
+    properties:
+      id:
+        type: integer
+      title:
+        type: string
+      description:
+        type: string
+      visibility:
+        type: boolean
+  Picture:
+    required:
+      - id
+      - title
+      - description
+      - date
+      - file_name
+      - path
+      - size
+    properties:
+      id:
+        type: integer
+      title:
+        type: string
+      description:
+        type: string
+      date:
+        type: string
+        format: date-time
+      file_name:
+        type: string
+      path:
+        type: string
+      size:
+        type: integer
+  MinPicture:
+    allOf:    
+      - $ref: '#/definitions/Picture'
+    required:
+      - type
+    properties:
+      type:
+        type: string
+  Tag:
+    required:
+      - id
+      - text
+    properties:
+      id:
+        type: integer
+      text:
+        type: string
+  Comment:
+    required:
+      - id
+      - text
+      - date
+    properties:
+      id:
+        type: integer
+      text:
+        type: string
+      date:
+        type: string
+        format: date-time
+  ImageListResponse:
+    properties:
+      images:
+        type: array
+        items:
+          type: object
+          properties:
+            id:
+              type: string
+            title:
+              type: string
+            path:
+              type: string
+  ImageResponse:
+    type: object
+    properties:
+      id:
+        type: string
+      title:
+        type: string
+      description:
+        type: string
+      date:
+        type: string
+        format: date-time
+      path:
+        type: string
+      size:
+        type: integer
+  ImageUpdate:
+    type: object
+    properties:
+      title:
+        type: string
+      description:
+        type: string
+      date:
+        type: string
+        format: date-time
+  OperationStatus:
+    type: object
+    properties:
+      id:
+        type: string
+      status:
+        type: string
+  ErrorResponse:
+    required:
+    - message
+    properties:
+      message:
+        type: string
+        
+
+
